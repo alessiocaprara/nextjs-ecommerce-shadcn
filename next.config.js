@@ -1,4 +1,16 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+    experimental: {
+        serverActions: true
+    },
+    images: {
+        remotePatterns: [
+            { hostname: "images.unsplash.com" },
+            { hostname: "plus.unsplash.com" },
+            { hostname: "lh3.googleusercontent.com" },
+            { hostname: "tailwindui.com" },
+        ]
+    }
+}
 
 module.exports = nextConfig
