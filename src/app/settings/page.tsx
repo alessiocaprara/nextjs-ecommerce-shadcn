@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db/prisma-client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "../api/auth/[...nextauth]/route";
-import UserProfileForm from "./profile-form";
+import UserProfile from "./user-profile";
 
 export default async function SettingsProfilePage() {
 
@@ -25,12 +25,12 @@ export default async function SettingsProfilePage() {
 
     return (
         <div className="space-y-6">
-            <div>
+            <div className="mb-12">
                 <h3 className="text-lg font-medium">Profile</h3>
                 <p className="text-sm text-muted-foreground">This is how others will see you on the site</p>
             </div>
-            <Separator />
-            <UserProfileForm user={authenticatedUser} />
+            {/* <Separator /> */}
+            <UserProfile user={authenticatedUser} />
         </div>
     )
 }
