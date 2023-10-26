@@ -1,15 +1,15 @@
-import './globals.css'
+import Navbar from '@/components/Navbar'
+import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { NextAuthSessionProvider } from './NextAuthSessionProvider'
-import Navbar from '@/components/navbar/Navbar'
-import { Toaster } from '@/components/ui/toaster'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Capramazon',
-  description: 'App generated using shadcn library',
+  title: 'CaprAmazon',
+  description: 'Nextjs App generated using shadcn library',
 }
 
 export default function RootLayout({
@@ -24,7 +24,6 @@ export default function RootLayout({
           <Navbar />
           <main>{children}</main>
           <Toaster />
-          {/* Footbar */}
         </NextAuthSessionProvider>
       </body>
     </html>

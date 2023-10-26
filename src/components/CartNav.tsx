@@ -1,12 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { ShoppingCart } from "@/lib/db/cart"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "@/lib/db/cart";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Avatar } from "./ui/avatar";
 
 interface CartNavProps {
     cart: ShoppingCart | null;

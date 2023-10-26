@@ -1,36 +1,18 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, } from "@/components/ui/command"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
+import { toast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon, CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from "@/components/ui/command"
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { toast } from "@/components/ui/use-toast"
 
 const languages = [
     { label: "English", value: "en" },
@@ -47,18 +29,12 @@ const languages = [
 const accountFormSchema = z.object({
     name: z
         .string()
-        .min(2, {
-            message: "Name must be at least 2 characters.",
-        })
-        .max(30, {
-            message: "Name must not be longer than 30 characters.",
-        }),
-    dob: z.date({
-        required_error: "A date of birth is required.",
-    }),
-    language: z.string({
-        required_error: "Please select a language.",
-    }),
+        .min(2, { message: "Name must be at least 2 characters.", })
+        .max(30, { message: "Name must not be longer than 30 characters.", }),
+    dob: z
+        .date({ required_error: "A date of birth is required.", }),
+    language: z
+        .string({ required_error: "Please select a language.", }),
 })
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
@@ -70,13 +46,13 @@ const defaultValues: Partial<AccountFormValues> = {
 }
 
 export function AccountForm() {
+
     const form = useForm<AccountFormValues>({
         resolver: zodResolver(accountFormSchema),
         defaultValues,
     })
 
     function onSubmit(data: AccountFormValues) {
-        console.log("On submit");
         toast({
             title: "You submitted the following values:",
             description: (

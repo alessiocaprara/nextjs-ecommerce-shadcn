@@ -9,6 +9,7 @@ const nextConfig = {
             { hostname: "plus.unsplash.com" },
             { hostname: "lh3.googleusercontent.com" },
             { hostname: "tailwindui.com" },
+            { hostname: "localhost" },
         ]
     }
 }

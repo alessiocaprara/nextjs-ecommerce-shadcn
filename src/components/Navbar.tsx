@@ -1,12 +1,13 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getCart } from "@/lib/db/cart";
+import { User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { MainNav } from "../homepage/main-nav";
-import { Search } from "../homepage/search";
-import TeamSwitcher from "../homepage/team-switcher";
-import { UserNav } from "../homepage/user-nav";
-import { CartNav } from "../homepage/cart-nav";
+import { UserNav } from "./UserNav";
+import { CartNav } from "./CartNav";
+import { MainNav } from "./MainNav";
+import { Search } from "./homepage/search";
+import TeamSwitcher from "./homepage/team-switcher";
 
 async function searchProducts(formData: FormData) {
     "use server";
@@ -23,24 +24,21 @@ export default async function Navbar() {
 
     return (
 
-        <div className="hidden flex-col md:flex">
+        <div className="hidden flex-col md:flex"> {/* hidden until "md" (todo: implement mobile responsiveness) */}
 
-            {/* This is the Navbar */}
             <div className="border-b">
                 <div className="flex h-16 items-center px-4">
-                    <TeamSwitcher />
-                    <MainNav className="mx-6" />
+                    <TeamSwitcher /> {/* This component will be removed, here only as example */}
+                    <MainNav className="mx-6" /> {/* Main nav links */}
                     <div className="ml-auto flex items-center space-x-4">
-                        <Search />
+                        <Search /> {/* This component could be removed, here only as example */}
                         <CartNav cart={cart} />
-                        <UserNav session={session} />
+                        <UserNav user={session?.user as User} />
                     </div>
                 </div>
             </div>
 
-
         </div>
-
 
     )
 }
