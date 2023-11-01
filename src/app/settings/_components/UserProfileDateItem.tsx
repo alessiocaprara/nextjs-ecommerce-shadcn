@@ -7,15 +7,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { toast } from "@/components/ui/use-toast"
-import { cn, isValidDate } from "@/lib/utils"
+import { isValidDate } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format, parse } from "date-fns"
-import delay from "delay"
-import { CalendarIcon, ChevronRight, Loader2 } from "lucide-react"
+import { ArrowLeft, CalendarIcon, Loader2 } from "lucide-react"
 import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { updateUser } from "../actions"
+import { updateRemoveUser, updateUser } from "../actions"
 
 const userProfileDateItemSchema = z.object({
     userField: z.string().refine((value) => isValidDate(value), {
@@ -30,12 +29,14 @@ interface UserProfileDateItemProps {
     fieldName: string,
     label: string,
     value: Date | null,
+    onClose: () => void,
     className?: string,
 }
 
-export default function UserProfileDateItem({ userId, fieldName, label, value, className }: UserProfileDateItemProps) {
+export default function UserProfileDateItem({ userId, fieldName, label, value, onClose, className }: UserProfileDateItemProps) {
 
-    const [isPendingTransition, startTransition] = useTransition();
+    const [isPendingTransition1, startTransition1] = useTransition();
+    const [isPendingTransition2, startTransition2] = useTransition();
     const [dialogOpen, setDialogOpen] = useState(false);
 
     const form = useForm<userProfileTextItemValues>({
@@ -52,21 +53,13 @@ export default function UserProfileDateItem({ userId, fieldName, label, value, c
     }, [form, value]);
 
     async function onSubmit(data: userProfileTextItemValues) {
-        //await delay(500);
-        startTransition(async () => {
+        startTransition1(async () => {
             try {
-                if (!form.formState.dirtyFields.userField) {
-                    setDialogOpen(false);
-                    return
-                };
-
+                if (!form.formState.dirtyFields.userField) return;
                 const formData = new FormData();
                 formData.set(fieldName, parse(data.userField, "dd/MM/yyyy", new Date()).toISOString());
-
                 await updateUser(userId, formData);
-
-                setDialogOpen(false);
-
+                onClose();
                 toast({
                     variant: "confirmation",
                     description: "Profile successfully updated."
@@ -81,85 +74,107 @@ export default function UserProfileDateItem({ userId, fieldName, label, value, c
     }
 
     return (
-        <Dialog
-            open={dialogOpen}
-            onOpenChange={(open) => {
-                setDialogOpen(open);
-                if (!open) form.reset();
-            }}
-        >
-
-            <DialogTrigger asChild>
-                <div className={cn("flex items-center py-4 px-4 hover:bg-muted hover:cursor-pointer", className)} >
-                    <div className="flex align-top w-full">
-                        <div className="w-40 flex-shrink-0 text-sm font-medium leading-none">{label}</div>
-                        <div className="w-full pe-4 text-sm leading-none">{value ? format(value, "PPP") : "<No date provided>"}</div>
+        <div className="px-4 space-y-8">
+            <div className="flex pb-4">
+                <div className="w-full flex flex-col">
+                    <div className="flex items-center text-lg font-medium -ms-2">
+                        <ArrowLeft className="opacity-80 hover:cursor-pointer hover:bg-muted rounded-full p-1" size={30} onClick={() => onClose()} />
+                        Edit profile
                     </div>
-                    <ChevronRight className="h-6 w-6 flex-shrink-0 me-2" />
+                    <div className="text-sm text-muted-foreground">Make changes to your profile here. Click save when you are done.</div>
                 </div>
-            </DialogTrigger>
-
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Edit profile</DialogTitle>
-                    <DialogDescription>Make changes to your profile here. Click save when you are done.</DialogDescription>
-                </DialogHeader>
-
-                <Form {...form}>
-                    <form id="this-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4">
-                        <FormField
-                            control={form.control}
-                            name="userField"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>{label}</FormLabel>
-                                    <Popover>
-                                        <FormControl>
-                                            <div className="flex items-center">
-                                                <Input
-                                                    {...field}
-                                                    placeholder='dd/mm/yyyy'
-                                                    className="w-2/3"
-                                                />
-                                                <PopoverTrigger asChild>
-                                                    <Button variant={"ghost"} className="hover:bg-transparent -m-10">
-                                                        <CalendarIcon className="h-4 w-4 opacity-50 hover:cursor-pointer" />
-                                                    </Button>
-                                                </PopoverTrigger>
-                                            </div>
-                                        </FormControl>
-                                        <PopoverContent className="flex w-auto flex-col space-y-2 p-2" align="center">
-                                            <Calendar
-                                                mode="single"
-                                                selected={isValidDate(field.value) ? parse(field.value, "dd/MM/yyyy", new Date()) : new Date()}
-                                                onSelect={(date) => field.onChange(date ? format(date, "dd/MM/yyyy") : undefined)}
-                                                defaultMonth={isValidDate(field.value) ? parse(field.value, "dd/MM/yyyy", new Date()) : new Date()}
-                                                required
-                                                disabled={(date: Date) =>
-                                                    date > new Date() || date < new Date("1900-01-01")
-                                                }
-                                                initialFocus
+            </div>
+            <Form {...form}>
+                <form id="date-item-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4">
+                    <FormField
+                        control={form.control}
+                        name="userField"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                                <FormLabel>{label}</FormLabel>
+                                <Popover>
+                                    <FormControl>
+                                        <div className="flex items-center">
+                                            <Input
+                                                {...field}
+                                                placeholder='dd/mm/yyyy'
+                                                className="w-1/3"
                                             />
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </form>
-                </Form>
-                <DialogFooter>
-                    <Button
-                        type="submit"
-                        form="this-form"
-                        disabled={form.formState.isSubmitting || !form.formState.dirtyFields.userField}
-                    >
-                        Save changes
-                        {form.formState.isSubmitting && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-
-        </Dialog >
+                                            <PopoverTrigger asChild>
+                                                <Button variant={"ghost"} className="hover:bg-transparent -m-10">
+                                                    <CalendarIcon className="h-4 w-4 opacity-50 hover:cursor-pointer" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                        </div>
+                                    </FormControl>
+                                    <PopoverContent className="flex w-auto flex-col space-y-2 p-2" align="center">
+                                        <Calendar
+                                            mode="single"
+                                            selected={isValidDate(field.value) ? parse(field.value, "dd/MM/yyyy", new Date()) : new Date()}
+                                            onSelect={(date) => field.onChange(date ? format(date, "dd/MM/yyyy") : undefined)}
+                                            defaultMonth={isValidDate(field.value) ? parse(field.value, "dd/MM/yyyy", new Date()) : new Date()}
+                                            required
+                                            disabled={(date: Date) =>
+                                                date > new Date() || date < new Date("1900-01-01")
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </form>
+            </Form>
+            <div className="space-x-3">
+                <Button
+                    type="submit"
+                    form="date-item-form"
+                    disabled={isPendingTransition1 || !form.formState.dirtyFields.userField || !form.watch("userField")}
+                >
+                    Save changes
+                    {isPendingTransition1 && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
+                </Button>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" disabled={value === null}>Remove</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader className="mb-6">
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>This action cannot be undone.</DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                            <Button
+                                disabled={isPendingTransition2}
+                                onClick={() => {
+                                    startTransition2(async () => {
+                                        try {
+                                            await updateRemoveUser(userId, fieldName);
+                                            setDialogOpen(false);
+                                            onClose();
+                                            toast({
+                                                variant: "confirmation",
+                                                description: "Profile successfully updated."
+                                            })
+                                        } catch (error) {
+                                            toast({
+                                                variant: "destructive",
+                                                description: (error as Error).message
+                                            })
+                                        }
+                                    })
+                                }}
+                            >
+                                Continue
+                                {isPendingTransition2 && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div >
+        </div>
     )
 }
