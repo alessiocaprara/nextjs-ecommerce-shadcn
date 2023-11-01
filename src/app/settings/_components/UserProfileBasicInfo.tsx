@@ -20,7 +20,6 @@ export default function UserProfileBasicInfo({ user }: { user: User }) {
                 <div className="text-sm text-muted-foreground">{user.email}</div>
             </div>
 
-
             <div className="flex items-center py-3 px-4 hover:bg-muted hover:cursor-pointer">
                 <div className="flex align-top w-full">
                     <div className="w-40 flex-shrink-0 text-sm font-medium leading-none">Profile picture</div>
@@ -35,7 +34,6 @@ export default function UserProfileBasicInfo({ user }: { user: User }) {
                     className="rounded-full h-16 w-16 flex-shrink-0 border border-black"
                 />
             </div>
-
 
             <UserProfileTextItem userId={user.id} label="Username" fieldName="username" value={user.username} />
             <UserProfileDateItem userId={user.id} label="Date of birth" fieldName="dob" value={user.dob} />
